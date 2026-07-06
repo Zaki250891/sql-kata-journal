@@ -27,6 +27,6 @@ age_group     | avg_pet_count  | max_pet_owner     | max_pet_count
  61 and above | 0.76e1         | David Mann DDS    |  10
  31-45        | 0.34e1         | Trey Boyle        |  5
 
- ***Primer CTE***
+ **Primer CTE**
  _Normalizar los datos_
- 
+
