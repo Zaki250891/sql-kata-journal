@@ -11,7 +11,8 @@ no_address_customers AS (
         fd.customerid,
         fd.total_price,
         a.addressid
-    from filtered_data  
+        'no address' as issue
+    from filtered_data fd
     left join addresses a
     on fd.customerid = a.customerid
     where a.addressid is null
@@ -22,6 +23,7 @@ wrong_address_customers AS (
         fd.customerid,
         fd.total_price,
         s.addressid
+        'wrong_addres' as issue
     from filtered_data fd
     left join sales s
     on fd.customerid = s.customerid
@@ -30,7 +32,10 @@ wrong_address_customers AS (
     and s.customerid = a.customerid
     where a.addressid is null
     
-)
+),
+
+
+
 
 
 
