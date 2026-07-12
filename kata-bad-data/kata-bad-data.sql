@@ -25,6 +25,14 @@ wrong_address_customers AS (
         s.addressid,
         'wrong_address' as issue
     from filtered_data fd
+    where exists (
+    select 1
+    from sales s
+    where s.customerid = fd.customerid
+    left join addresses a
+    on s.addressid = a.addressid
+)
+    )
     left join sales s
     on fd.customerid = s.customerid
     left join addresses a
