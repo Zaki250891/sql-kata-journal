@@ -10,52 +10,57 @@ no_address_customers AS (
     select 
         fd.customerid,
         fd.total_price,
-        a.addressid,
         'no address' as issue
     from filtered_data fd
     left join addresses a
     on fd.customerid = a.customerid
     where a.addressid is null
 ),
-
 wrong_address_customers AS (
     select 
         fd.customerid,
         fd.total_price,
-        s.addressid,
         'wrong_address' as issue
     from filtered_data fd
     where exists (
-    select 1
-    from sales s
-    where s.customerid = fd.customerid
-    left join addresses a
-    on s.addressid = a.addressid
-)
+        select 1
+        from sales s
+        where s.customerid = fd.customerid
+        and s.addressid is not null
+        and s.addressid not in (
+            select addressid 
+            from addresses a
+            where a.addressid = s.addressid
+            and a.customerid = s.customerid   
+        )
     )
-    left join sales s
-    on fd.customerid = s.customerid
-    left join addresses a
-    on s.addressid = a.addressid
-    and s.customerid = a.customerid
-    where a.addressid is null
-    group by fd.customerid, fd.total_price, s.addressid
-    order by fd.customerid, fd.total_price, s.addressid
+     and fd.customerid not in (
+        select customerid 
+        from no_address_customers
+    )
 ),
-
 customers_to_contact as (
     select 
-        fd.customerid,
-        fd.total_price,
-        fd.issue
-    from no_address_customers fd
+        nac.customerid,
+        nac.total_price,
+        nac.issue
+    from no_address_customers nac
     union all
     select 
-        fd.customerid,
-        fd.total_price,
-        fd.issue
-    from wrong_address_customers fd
+        wac.customerid,
+        wac.total_price,
+        wac.issue
+    from wrong_address_customers wac
+),
+
+ordered_customers as (
+    select 
+        customerid,
+        total_price,
+        issue
+    from customers_to_contact
+    order by total_price desc
 )
 
 select *
-from customers_to_contact
+from ordered_customers;
