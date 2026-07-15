@@ -67,12 +67,35 @@ assigned_reps as (
         oc.issue,
         oc.rn,
         case 
-            when rn % 3 = 1 then 'Rep A'
-            when rn % 3 = 2 then 'Rep B'
-            else 'Rep C'
-        end as assigned_rep
+            when rn % 3 = 1 then 1
+            when rn % 3 = 2 then 2
+            else 3
+        end as rep_number
     from ordered_customers oc
-)
-
-select *
-from ordered_customers;
+),
+ordered_reps as (
+    select 
+        salesrepid,
+        CONCAT(firstname, ' ', lastname) as sales_rep,
+        row_number() over (order by hiredate asc) as rep_number
+    from salesreps
+),
+final_report as (
+    select 
+        ar.total_bought,
+        orp.salesrepid,
+        orp.sales_rep,
+        ar.customerid
+    from assigned_reps ar
+    join ordered_reps orp
+    on ar.rep_number = orp.rep_number
+    join customers c
+    on ar.customerid = c.customerid
+    group by ar.total_bought, orp.salesrepid, orp.sales_rep, ar.customerid
+    order by ar.total_bought desc, email asc
+),
+select 
+    email,
+    total_bought,
+    sales_rep as sales_rep_id,
+    issue as script
