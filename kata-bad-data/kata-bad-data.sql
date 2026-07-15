@@ -94,8 +94,22 @@ final_report as (
     group by ar.total_bought, orp.salesrepid, orp.sales_rep, ar.customerid
     order by ar.total_bought desc, email asc
 ),
+script_messages as (
+    select 
+        customerid,
+CASE
+    WHEN issue = 'wrong_address' THEN 'You've spent enough money with us so we care about your business. Unfortunately you have selected a bad address. Please login to our site and select a good address.'
+    WHEN issue = 'no address' THEN 'You've spent enough money with us so we care about your business. You don't have an address on file yet you've selected an address. Please login to our site and add an address so we may use it... Don't ask any questions on how this happened.'
+END AS script
+    from customers_to_contact
+)
 select 
     email,
     total_bought,
-    sales_rep as sales_rep_id,
-    issue as script
+    sales_rep as rep_name,
+    sm.script
+from final_report fr
+join customers c
+on fr.customerid = c.customerid 
+join script_messages sm
+on c.customerid = sm.customerid
