@@ -30,8 +30,7 @@ wrong_address_customers AS (
         and s.addressid not in (
             select addressid 
             from addresses a
-            where a.addressid = s.addressid
-            and a.customerid = s.customerid   
+            where a.customerid = s.customerid   
         )
     )
      and fd.customerid not in (
@@ -54,11 +53,13 @@ customers_to_contact as (
 ),
 ordered_customers as (
     select 
-        customerid,
-        total_bought,
-        issue,
-        row_number() over (order by total_bought desc) as rn
-    from customers_to_contact
+        ctc.customerid,
+        ctc.total_bought,
+        ctc.issue,
+        row_number() over (order by ctc.total_bought desc, c.email asc) as rn
+    from customers_to_contact ctc
+    join customers c
+    on ctc.customerid = c.customerid
 ),
 assigned_reps as (
     select 
@@ -76,7 +77,10 @@ assigned_reps as (
 ordered_reps as (
     select 
         salesrepid,
-        CONCAT(firstname, ' ', lastname) as sales_rep,
+        CASE 
+            WHEN lastname IS NULL OR TRIM(lastname) = '' THEN firstname
+            ELSE firstname || ' ' || lastname
+        END as sales_rep,
         row_number() over (order by hiredate asc) as rep_number
     from salesreps
 ),
@@ -91,15 +95,13 @@ final_report as (
     on ar.rep_number = orp.rep_number
     join customers c
     on ar.customerid = c.customerid
-    group by ar.total_bought, orp.salesrepid, orp.sales_rep, ar.customerid
-    order by ar.total_bought desc, email asc
 ),
 script_messages as (
     select 
         customerid,
 CASE
-    WHEN issue = 'wrong_address' THEN 'You've spent enough money with us so we care about your business. Unfortunately you have selected a bad address. Please login to our site and select a good address.'
-    WHEN issue = 'no address' THEN 'You've spent enough money with us so we care about your business. You don't have an address on file yet you've selected an address. Please login to our site and add an address so we may use it... Don't ask any questions on how this happened.'
+    WHEN issue = 'wrong_address' THEN 'You''ve spent enough money with us so we care about your business. Unfortunately you have selected a bad address. Please login to our site and select a good address.'
+    WHEN issue = 'no address' THEN 'You''ve spent enough money with us so we care about your business. You don''t have an address on file yet you''ve selected an address. Please login to our site and add an address so we may use it... Don''t ask any questions on how this happened.'
 END AS script
     from customers_to_contact
 )
@@ -113,3 +115,4 @@ join customers c
 on fr.customerid = c.customerid 
 join script_messages sm
 on c.customerid = sm.customerid
+order by total_bought desc, email asc;
