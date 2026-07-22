@@ -29,3 +29,11 @@ name: El nombre completo del cliente (concatenando first_name y last_name con un
 date_rental_occurred: La fecha del alquiler (únicamente la fecha, sin la parte de la hora).
 
 consecutive_days: El tamaño del grupo de días consecutivos al que pertenece cada fecha (mínimo 1).
+
+**En mis palabras:**
+Por cada día que el cliente seleccionado ha rentado una película, debo identificar a que grupo de "rentas consecutivas" pertenece. O sea encontrar secuencias de días en donde cada día es. directamente consecutivo o le sigue otro día (ejemplo: 14, 15, 16 de febrero que forman un grupo de 3 días consecutivos).
+
+Por cada día de renta determinar el tamaño de lso grupos de días consecutivos.
+
+Asegurar que cada fecha aparezca una sola vez en los resultados, si el customer rentó más de una película debe tomarse como como un solo día.
+
