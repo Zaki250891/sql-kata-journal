@@ -37,3 +37,4 @@ Por cada día de renta determinar el tamaño de lso grupos de días consecutivos
 
 Asegurar que cada fecha aparezca una sola vez en los resultados, si el customer rentó más de una película debe tomarse como como un solo día.
 
+*_RESULTADO ESPERADO: name, date_rental_ocurred, consecutive_days_*
