@@ -10,3 +10,10 @@ date_rental AS(
         CAST(rental_date AS DATE) as date_rental_occurred
     from customer_one   
 ),
+previous_date AS(
+     select
+         date_rental_ocurred,
+         LAG(date_rental_ocurred) OVER (ORDER BY date_rental_ocurred asc
+         ) as previous_rental_date
+     from date_rental
+select * from previous_date;
