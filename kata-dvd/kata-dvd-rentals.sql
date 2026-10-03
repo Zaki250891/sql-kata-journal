@@ -6,9 +6,10 @@ with customer_one AS(
     where customer_id = 1 
 ),
 date_rental AS(
-    select distinct
-        CAST(rental_date AS DATE) as date_rental_occurred
-    from customer_one   
+    select
+        customer_id,
+        rental_date::date as date_rental_ocurred
+    from customer_one
 ),
 previous_date AS(
      select
@@ -17,3 +18,4 @@ previous_date AS(
          ) as previous_rental_date
      from date_rental
 select * from previous_date;
+
