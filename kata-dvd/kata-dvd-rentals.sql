@@ -17,5 +17,13 @@ previous_date AS(
          LAG(date_rental_ocurred) OVER (ORDER BY date_rental_ocurred asc
          ) as previous_rental_date
      from date_rental
+on_a_roll AS(
+    case 
+        when previous_rental_date is null then 0
+        when date_rental_ocurred - previous_rental_date = 1 then 1
+        else 0
+    end as on_a_roll
+    from previous_date
+)
 select * from previous_date;
 
