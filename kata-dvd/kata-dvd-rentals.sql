@@ -18,12 +18,15 @@ previous_date AS(
          ) as previous_rental_date
      from date_rental
 on_a_roll AS(
-    case 
+      select  
+        rental_date,
+        previous_rental_date,
+        case 
         when previous_rental_date is null then 0
-        when date_rental_ocurred - previous_rental_date = 1 then 1
+        when rental_date - previous_rental_date = 1 then 1
         else 0
-    end as on_a_roll
+    end as on_a_roll    
     from previous_date
 )
-select * from previous_date;
+select * from on_a_roll;
 
