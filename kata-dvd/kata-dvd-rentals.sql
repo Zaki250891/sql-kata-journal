@@ -17,6 +17,7 @@ previous_date AS(
          LAG(date_rental_ocurred) OVER (ORDER BY date_rental_ocurred asc
          ) as previous_rental_date
      from date_rental
+),
 on_a_roll AS(
       select  
         rental_date,
