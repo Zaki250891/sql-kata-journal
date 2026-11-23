@@ -8,26 +8,32 @@ with customer_one AS(
 date_rental AS(
     select distinct
         customer_id,
-        rental_date::date as date_rental_ocurred
+        rental_date::date as date_rental_occurred
     from customer_one
 ),
 previous_date AS(
      select 
-         date_rental_ocurred,
-         LAG(date_rental_ocurred) OVER (ORDER BY date_rental_ocurred asc
+         date_rental_occurred,
+         LAG(date_rental_occurred) OVER (ORDER BY date_rental_occurred asc
          ) as previous_rental_date
      from date_rental
 ),
-on_a_roll AS(
+starts_group AS(
       select  
-        rental_date,
+        date_rental_occurred,
         previous_rental_date,
         case 
-        when previous_rental_date is null then 0
-        when rental_date - previous_rental_date = 1 then 1
-        else 0
-    end as on_a_roll    
+        when previous_rental_date is null then 1
+        when date_rental_occurred - previous_rental_date = 1 then 0
+        else 1
+    end as starts_group    
     from previous_date
+),
+grouped_dates AS(
+    select 
+        date_rental_occurred,
+        sum(starts_group) over (order by date_rental_occurred asc) as group_id
+    from starts_group
 )
-select * from on_a_roll;
+select * from grouped_dates;
 
