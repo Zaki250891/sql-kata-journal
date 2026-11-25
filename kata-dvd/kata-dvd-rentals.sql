@@ -35,5 +35,11 @@ grouped_dates AS(
         sum(starts_group) over (order by date_rental_occurred asc) as group_id
     from starts_group
 )
-select * from grouped_dates;
-
+consecutive_counts AS(
+    select 
+        group_id,
+        count(*) as consecutive_days
+    from grouped_dates
+    group by group_id
+)
+select * from consecutive_counts;
