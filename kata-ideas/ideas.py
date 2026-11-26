@@ -1,4 +1,4 @@
-def ideas(x):
+def well(x):
     if x.count('good') == 1:
         return "Publish!"
     if x.count('good') == 2:
